@@ -1,0 +1,41 @@
+{
+    "name": "darrenwilly/dv-doctrine",
+    "description": "Doctrine Bridge for Symfony, Zend Express, Zend MVC2 & 3 for simplicity ",
+    "type": "DV Doctrine Core Library",
+    "homepage": "https://github.com/dv-doctrine",
+    "license": "Commercial",
+    "keywords": [
+        "darvism",
+        "solutions",
+        "zend acl" ,
+        "zend expressive"
+    ],
+    "config": {
+        "sort-packages": true
+    },
+
+    "support": {
+        "issues": "https://support.darvism.com"
+    },
+    "require": {
+        "php": "^7.2",
+        "zendframework/zend-servicemanager": "^3.3",
+        "zendframework/zend-config": "3.2",
+        "scienta/doctrine-json-functions": "^4.0",
+        "ramsey/uuid-doctrine": "^1.5",
+        "dasprid/container-interop-doctrine": "^1.1",
+        "doctrine/doctrine-migrations-bundle": "^2.0",
+        "doctrine/orm": "^2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0.1",
+        "zendframework/zend-coding-standard": "~1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "DV\\Doctrine\\": "src/"
+        }
+    },
+    "scripts": {
+    }
+}
