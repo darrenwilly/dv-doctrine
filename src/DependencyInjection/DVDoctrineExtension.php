@@ -26,7 +26,7 @@ class DVDoctrineExtension extends Extension implements PrependExtensionInterface
     {
         if(! defined('DV_DOCTRINE_INITIALIZED'))    {
             ## load the bootstrap file
-            $bootstrap = dirname(dirname(__DIR__)) . '/boostrap.php' ;
+            $bootstrap = dirname(dirname(__DIR__)) . '/bootstrap.php' ;
             ##
             if(! file_exists($bootstrap))    {
                 throw new \RuntimeException('bootstrap file is required to initialized the Bundle for interopability purpose') ;
@@ -46,7 +46,7 @@ class DVDoctrineExtension extends Extension implements PrependExtensionInterface
 
         }
         catch (\Throwable $exception)   {
-            var_dump($exception->getMessage() . '<br>'. $exception->getTraceAsString()); exit;
+           # var_dump($exception->getMessage() . '<br>'. $exception->getTraceAsString()); exit;
         }
     }
 
