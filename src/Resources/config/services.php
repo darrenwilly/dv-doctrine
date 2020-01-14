@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference ;
  */
 if(! defined('DV_DOCTRINE_INITIALIZED'))    {
     ## load the bootstrap file
-    $bootstrap = dirname(dirname(dirname(__DIR__))) . '/boostrap.php' ;
+    $bootstrap = dirname(dirname(dirname(__DIR__))) . '/bootstrap.php' ;
     ##
     if(! file_exists($bootstrap))    {
         throw new \RuntimeException('bootstrap file is required to initialized the Bundle for interopability purpose') ;
@@ -17,66 +17,36 @@ if(! defined('DV_DOCTRINE_INITIALIZED'))    {
     require $bootstrap ;
 }
 
-$definition = new Definition();
 
-$definition
-    ->setAutowired(true)
-    ->setAutoconfigured(true)
-    ->setPublic(true);
-
-
-## Same as before
-$definition = new Definition();
-
-$definition
-    ->setAutowired(true)
-    ->setAutoconfigured(true)
-    ->setPublic(true);
-
-#$this->registerClasses($definition, 'DV\\Doctrine\\', DV_DOCTRINE_ROOT . '/src/*' , DV_DOCTRINE_ROOT.'/src/root-source/src/{Resources}');
-
-if($container->has(\Doctrine\ORM\EntityManagerInterface::class))    {
+return function(ContainerConfigurator $configurator) use($container)    {
+    ## default configuration for services in *this* file
+    $services = $configurator->services()
+        ->defaults()
+        ->autowire()      // Automatically injects dependencies in your services.
+        ->autoconfigure() // Automatically registers your services as commands, event subscribers, etc.
+        ->public()
+    ;
     ##
-    $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , \Doctrine\ORM\EntityManagerInterface::class) ;
-}
+    $configurator->import(__DIR__.'/autoload/*.php');
 
-if($container->hasAlias('doctrine.orm.default_entity_manager'))    {
+    #$this->registerClasses($definition, 'DV\\Doctrine\\', DV_DOCTRINE_ROOT . '/src/*' , DV_DOCTRINE_ROOT.'/src/root-source/src/{Resources}');
+
+    if($container->has(\Doctrine\ORM\EntityManagerInterface::class))    {
+        ##
+        $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , \Doctrine\ORM\EntityManagerInterface::class) ;
+    }
+
+    if($container->hasAlias('doctrine.orm.default_entity_manager'))    {
+        ##
+        $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , 'doctrine.orm.default_entity_manager') ;
+        $container->setAlias('doctrine.entity_manager.orm_default', 'doctrine.orm.default_entity_manager') ;
+    }
+
+    if($container->has('doctrine.connection.orm_default'))    {
+        ##
+        $container->setAlias(sprintf('doctrine.connection.%s' , DOCTRINE_ORM_READ) , 'doctrine.connection.orm_default') ;
+    }
+
     ##
-    $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , 'doctrine.orm.default_entity_manager') ;
-    $container->setAlias('doctrine.entity_manager.orm_default', 'doctrine.orm.default_entity_manager') ;
-}
-
-if($container->has('doctrine.connection.orm_default'))    {
-    ##
-    $container->setAlias(sprintf('doctrine.connection.%s' , DOCTRINE_ORM_READ) , 'doctrine.connection.orm_default') ;
-}
-
-
-/*
-if($container->hasAlias(\Doctrine\ORM\EntityManager::class))    {
-    ##
-    $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , \Doctrine\ORM\EntityManager::class) ;
-}
-
-if($container->hasAlias('doctrine.connection.orm_default'))    {
-    ##
-    $container->setAlias('doctrine.connection.orm_default' , sprintf('doctrine.connection.%s' , DOCTRINE_ORM_READ) ) ;
-}
-
-## Explicitly configure the service
-
-$container->register(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ))
-                    ->setArgument(DOCTRINE_ORM_READ)
-                    ->setFactory(new Reference(\DV\Doctrine\InteropEntityManagerService::class));
-
-$container->register(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_WRITE))
-                    ->setArgument(DOCTRINE_ORM_WRITE)
-                    ->setFactory(new Reference(\DV\Doctrine\InteropEntityManagerService::class ));
-
-$container->register(\DV\Authentication\Options\Authentication::class)
-            ->setFactory(new Reference(\DV\Authentication\Options\Authentication::class));
-##
-$container->register(\DV\Authentication\Adapter\ObjectRepository::class)
-            ->setFactory(new Reference());*/
-
-#return $container ;
+    return $services;
+};
