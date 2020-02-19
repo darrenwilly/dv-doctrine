@@ -12,13 +12,13 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use DV\Expressive\Service\ContainerFactory;
+
 use DV\Doctrine\DBAL\Type\DateTimeToTimestampOutputType;
 use DV\Doctrine\DBAL\Type\JsonType;
 use DV\MicroService\TraitContainer;
 use ReflectionObject ;
 use ReflectionProperty ;
-use Zend\Stdlib\Parameters;
+use Laminas\Stdlib\Parameters;
 use Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql as DqlFunctions;
 
 trait Doctrine
