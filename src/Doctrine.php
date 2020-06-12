@@ -12,7 +12,7 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
+use DV\ContainerService\ServiceLocatorFactory;
 use DV\Doctrine\DBAL\Type\DateTimeToTimestampOutputType;
 use DV\Doctrine\DBAL\Type\JsonType;
 use DV\MicroService\TraitContainer;
@@ -66,7 +66,7 @@ trait Doctrine
             ##
             if(! isset($options['entityIdentifier']))    {
                 ##
-                $options['entityIdentifier'] = 'doctrine.entity_manager.orm_read' ;
+                $options['entityIdentifier'] = 'doctrine.orm.default_entity_manager' ;
             }
             ##
             $entityIdentifier = $options['entityIdentifier'] ;
@@ -107,7 +107,8 @@ trait Doctrine
 
 	static public function createEntityIdentifier($identifier=DOCTRINE_ORM_READ) : array
     {
-        return ['entityIdentifier' => sprintf('doctrine.entity_manager.%s' , $identifier)] ;
+        ## doctrine.orm.default_entity_manager
+        return ['entityIdentifier' => sprintf('doctrine.orm.%s_entity_manager' , $identifier)] ;
     }
 
     public function registerJsonFunctions(EntityManager &$em) : void
@@ -253,14 +254,14 @@ trait Doctrine
      *
      * @param string $service_name
      * @param string $params
-     * @return  mixed|\Zend\ServiceManager\ServiceManager
+     * @return  mixed|\Laminas\ServiceManager\ServiceManager
      */
     public function getLocator($service_name)
     {
         if($container = $this->getContainer())  {
             return $container->get($service_name) ;
         }
-        return ContainerFactory::getLocator($service_name) ;
+        return ServiceLocatorFactory::getLocator($service_name) ;
     }
 
     protected function persist($entity)
@@ -295,8 +296,11 @@ trait Doctrine
     }
 
 
-    public function createQueryBuilder($alias, $indexBy = null)
+    public function createQueryBuilder($alias=null , $indexBy = null)
     {
+        if(null == $alias)    {
+            $alias = self::$default_entity_alias ;
+        }
         return $this->getDoctrineEntityManager()->createQueryBuilder($alias) ;
     }
 

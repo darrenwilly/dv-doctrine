@@ -1,14 +1,14 @@
 {
-    "name": "darrenwilly/dv-doctrine",
-    "description": "Doctrine Bridge for Symfony, Zend Express, Zend MVC2 & 3 for simplicity ",
+    "name": "darviews/dv-doctrine",
+    "description": "Doctrine Bridge for Symfony, Laminas Express, Laminas MVC2 & 3 for simplicity ",
     "type": "DV Doctrine Core Library",
     "homepage": "https://github.com/dv-doctrine",
     "license": "Commercial",
     "keywords": [
         "darvism",
         "solutions",
-        "zend acl" ,
-        "zend expressive"
+        "Laminas acl" ,
+        "Laminas expressive"
     ],
     "config": {
         "sort-packages": true

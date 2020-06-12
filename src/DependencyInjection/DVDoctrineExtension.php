@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use \Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql as DqlFunction ;
 
 /**
  * This is the class that loads and manages DVDoctrineBundle configuration.
@@ -16,6 +17,50 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
  */
 class DVDoctrineExtension extends Extension implements PrependExtensionInterface
 {
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        /**
+         * make sure atleast one of the SCIENTA library class exist
+         */
+        if(! class_exists(\Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonSearch::class))    {
+             return;
+        }
+
+        ## fetch all the extension
+        $extension = $container->getExtensions() ;
+
+        ##
+        if (isset($extension['doctrine'])) {
+            /**
+             * load extra JSON Function lbrary and add it to ORM JSON String functions.
+             * This logic will be enhance later to load all the file in the adapter directory and use the class name
+             * to add them to string_functions
+             */
+            $ormConfig = [
+                'orm' => [
+                    'entity_managers' => [
+                        'default' => [
+                            'dql' => [
+                                'string_functions' => [
+                                    DqlFunction\JsonSearch::FUNCTION_NAME => DqlFunction\JsonSearch::class,
+                                    DqlFunction\JsonContains::FUNCTION_NAME => DqlFunction\JsonContains::class,
+                                    DqlFunction\JsonContainsPath::FUNCTION_NAME => DqlFunction\JsonContainsPath::class,
+                                    DqlFunction\JsonExtract::FUNCTION_NAME => DqlFunction\JsonExtract::class,
+                                    DqlFunction\JsonQuote::FUNCTION_NAME => DqlFunction\JsonQuote::class,
+                                    DqlFunction\JsonUnquote::FUNCTION_NAME => DqlFunction\JsonUnquote::class,
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ] ;
+
+            ##
+            $container->prependExtensionConfig('doctrine', $ormConfig);
+
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -37,7 +82,8 @@ class DVDoctrineExtension extends Extension implements PrependExtensionInterface
 
         try {
             ##
-            $locator = new FileLocator(dirname(__DIR__) . '/Resources/config/');
+            $locator = new FileLocator(dirname(__DIR__) . '/Resources/config');
+
             ##
             $loader = new PhpFileLoader($container, $locator);
             ##
@@ -50,15 +96,4 @@ class DVDoctrineExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * Ability to overide previous bundle configuration
-     *
-     * https://symfony.com/doc/4.1/bundles/prepend_extension.html
-     * @param ContainerBuilder $container
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        // get all bundles
-        $bundles = $container->getParameter('kernel.bundles');
-    }
 }

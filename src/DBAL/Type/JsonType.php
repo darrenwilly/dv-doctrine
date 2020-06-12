@@ -35,7 +35,7 @@ class JsonType extends parentClass
     {
         try{
             ##
-            if($value instanceof \Zend\Config\Config) {
+            if($value instanceof \Laminas\Config\Config) {
                 ##
                 $value = $value->toArray() ;
             }

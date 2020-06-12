@@ -2,6 +2,7 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference ;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator ;
 /**
  * This will also be called in the service class, Alway remember to exclude the Resources folder from the $this->>registerClasses to avoid call this file as a class
  * the problem can be very annoying
@@ -26,27 +27,32 @@ return function(ContainerConfigurator $configurator) use($container)    {
         ->autoconfigure() // Automatically registers your services as commands, event subscribers, etc.
         ->public()
     ;
-    ##
-    $configurator->import(__DIR__.'/autoload/*.php');
 
-    #$this->registerClasses($definition, 'DV\\Doctrine\\', DV_DOCTRINE_ROOT . '/src/*' , DV_DOCTRINE_ROOT.'/src/root-source/src/{Resources}');
-
-    if($container->has(\Doctrine\ORM\EntityManagerInterface::class))    {
+    try{
         ##
-        $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , \Doctrine\ORM\EntityManagerInterface::class) ;
-    }
+        #$configurator->import(__DIR__.'/autoload/*.php');
 
-    if($container->hasAlias('doctrine.orm.default_entity_manager'))    {
+        #$this->registerClasses($definition, 'DV\\Doctrine\\', DV_DOCTRINE_ROOT . '/src/*' , DV_DOCTRINE_ROOT.'/src/root-source/src/{Resources}');
+
+        #if($container->has(\Doctrine\ORM\EntityManagerInterface::class))    {
         ##
-        $container->setAlias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , 'doctrine.orm.default_entity_manager') ;
-        $container->setAlias('doctrine.entity_manager.orm_default', 'doctrine.orm.default_entity_manager') ;
-    }
+        $services->alias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , \Doctrine\ORM\EntityManagerInterface::class)->public() ;
+        #}
 
-    if($container->has('doctrine.connection.orm_default'))    {
+        #if($container->has('doctrine.orm.default_entity_manager'))    {
         ##
-        $container->setAlias(sprintf('doctrine.connection.%s' , DOCTRINE_ORM_READ) , 'doctrine.connection.orm_default') ;
-    }
+        $services->alias(sprintf('doctrine.entity_manager.%s' , DOCTRINE_ORM_READ) , 'doctrine.orm.default_entity_manager')->public();
+        $services->alias('doctrine.entity_manager.orm_default', 'doctrine.orm.default_entity_manager')->public() ;
+        # }
 
+        #if($container->has('doctrine.connection.orm_default'))    {
+        ##
+        $services->alias(sprintf('doctrine.connection.%s' , DOCTRINE_ORM_READ) , 'doctrine.dbal.default_connection')->public() ;
+        # }
+    }
+    catch (\Throwable $exception)   {
+        dump($exception); exit;
+    }
     ##
     return $services;
 };
